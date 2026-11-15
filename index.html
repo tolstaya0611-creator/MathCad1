@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест: Основи роботи в MathCAD</title>
+    <!-- Підключення Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Підключення шрифту Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.35s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="text-slate-800 flex flex-col items-center justify-center p-4 sm:p-6 md:p-8">
+
+    <!-- Головний контейнер додатку -->
+    <main class="w-full max-w-3xl">
+        
+        <!-- Шапка тесту -->
+        <header class="mb-6 text-center sm:text-left flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+                <span class="inline-block px-3 py-1 text-xs font-semibold tracking-wider text-indigo-700 uppercase bg-indigo-100 rounded-full mb-1.5">
+                    Інтерактивне тестування
+                </span>
+                <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight" id="quiz-topic-title">
+                    Тема тесту: Основи роботи в MathCAD
+                </h1>
+            </div>
+            <div id="header-counter" class="text-sm font-medium text-slate-500 bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow-sm border border-slate-200/70 self-center sm:self-end shrink-0">
+                Питання <span id="current-q-num" class="font-bold text-indigo-600">1</span> з <span id="total-q-num" class="font-bold text-slate-700">10</span>
+            </div>
+        </header>
+
+        <!-- ЕКРАН ТЕСТУВАННЯ -->
+        <section id="quiz-screen" class="bg-white rounded-3xl shadow-xl shadow-slate-200/70 border border-slate-100 overflow-hidden animate-fade-in">
+            
+            <!-- Індикатор прогресу -->
+            <div class="w-full bg-slate-100 h-2.5">
+                <div id="progress-bar" class="bg-indigo-600 h-2.5 transition-all duration-300 ease-out rounded-r-full" style="width: 10%"></div>
+            </div>
+
+            <!-- Тіло картки з питанням -->
+            <div class="p-6 sm:p-8 md:p-10">
+                <div class="flex items-center justify-between mb-4">
+                    <span id="question-badge" class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-900 text-white font-bold text-sm shadow-sm">
+                        1
+                    </span>
+                    <span class="text-xs font-medium text-slate-400 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200/70">
+                        Одна правильна відповідь
+                    </span>
+                </div>
+
+                <!-- Текст питання -->
+                <h2 id="question-text" class="text-lg sm:text-xl font-bold text-slate-900 leading-snug mb-2">
+                    <!-- Заповнюється через JS -->
+                </h2>
+
+                <!-- Підзаголовок варіантів -->
+                <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mt-6 mb-3">
+                    Варіанти відповідей
+                </p>
+
+                <!-- Список варіантів відповідей -->
+                <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <!-- Варіанти генеруються через JS -->
+                </div>
+
+                <!-- Повідомлення про необхідність вибору (замість alert) -->
+                <div id="validation-msg" class="hidden mt-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm font-medium flex items-center gap-2">
+                    <svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    <span>Будь ласка, оберіть один із варіантів відповіді перед тим, як продовжити.</span>
+                </div>
+            </div>
+
+            <!-- Швидка навігація по номерах питань -->
+            <div class="px-6 py-3 sm:px-8 bg-slate-50/40 border-t border-slate-100 flex flex-wrap items-center justify-center gap-2" id="pills-nav">
+                <!-- Генерується через JS -->
+            </div>
+
+            <!-- Нижня панель навігації -->
+            <div class="bg-slate-50/90 px-6 py-4 sm:px-8 sm:py-5 border-t border-slate-100 flex items-center justify-between gap-4">
+                <button id="prev-btn" type="button" class="px-4 py-2.5 rounded-xl font-semibold text-sm text-slate-600 bg-white border border-slate-200 hover:bg-slate-100 hover:text-slate-900 transition-colors disabled:opacity-40 disabled:pointer-events-none flex items-center gap-1.5 shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    Назад
+                </button>
+
+                <button id="next-btn" type="button" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 transition-all shadow-md shadow-indigo-200 flex items-center gap-1.5">
+                    <span id="next-btn-text">Далі</span>
+                    <svg id="next-btn-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- ЕКРАН РЕЗУЛЬТАТІВ -->
+        <section id="result-screen" class="hidden bg-white rounded-3xl shadow-xl shadow-slate-200/70 border border-slate-100 overflow-hidden animate-fade-in">
+            <div class="p-8 sm:p-12 text-center bg-gradient-to-b from-indigo-50/60 to-white">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-100 text-indigo-800 text-xs font-bold uppercase tracking-wider mb-3">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Тестування завершено
+                </div>
+                
+                <!-- Назва теми тесту в результатах -->
+                <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 mb-7" id="result-topic">
+                    Тема тесту: Основи роботи в MathCAD
+                </h2>
+
+                <!-- Візуальне кільце з відсотком вірних відповідей -->
+                <div class="relative inline-flex items-center justify-center mb-6">
+                    <svg class="w-40 h-40 sm:w-44 sm:h-44 transform -rotate-90">
+                        <circle cx="50%" cy="50%" r="68" stroke="#e2e8f0" stroke-width="12" fill="transparent" />
+                        <circle id="score-ring" cx="50%" cy="50%" r="68" stroke="#4f46e5" stroke-width="12" fill="transparent"
+                                stroke-dasharray="427.26" stroke-dashoffset="427.26" stroke-linecap="round"
+                                class="transition-all duration-1000 ease-out" />
+                    </svg>
+                    <div class="absolute flex flex-col items-center justify-center">
+                        <span id="score-percentage" class="text-4xl sm:text-5xl font-extrabold text-slate-900">0%</span>
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide mt-1">вірних</span>
+                    </div>
+                </div>
+
+                <p id="score-summary" class="text-base sm:text-lg font-medium text-slate-700 max-w-md mx-auto">
+                    <strong class="text-indigo-600 font-bold" id="correct-count">0</strong> з <strong class="text-slate-900 font-bold" id="total-count">10</strong> правильних відповідей
+                </p>
+                
+                <div id="grade-badge" class="mt-3 inline-block px-4 py-1.5 rounded-xl text-sm font-bold">
+                    <!-- Текстова оцінка -->
+                </div>
+
+                <div class="mt-8">
+                    <button id="restart-btn" type="button" class="px-7 py-3.5 rounded-xl font-bold text-sm text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 transition-all shadow-lg shadow-indigo-200 inline-flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Пройти тест ще раз
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Назва теми тесту
+        const QUIZ_TOPIC = "Основи роботи в MathCAD";
+
+        // Масив із 10 унікальних запитань
+        const questionsData = [
+            {
+                id: 1,
+                question: "Відзначте оператори, які використовуються для присвоєння значення змінній в MathCAD.",
+                options: [":=", "=", ":", "_"],
+                correctIndex: 0
+            },
+            {
+                id: 2,
+                question: "Відзначте оператори, які використовуються в MathCAD для обчислення значень функцій і арифметичних або алгебраїчних виразів",
+                options: [":=", ":", "=", "_"],
+                correctIndex: 2
+            },
+            {
+                id: 3,
+                question: "Відзначте типи графіків, які можна побудувати, використовуючи панель інструментів MathCAD «Graph» («Інструменти графіків»).",
+                options: ["кругова діаграма", "лінійчата діаграма", "поверхня", "з областями"],
+                correctIndex: 2
+            },
+            {
+                id: 4,
+                question: "Відзначте панелі інструментів, на яких присутня кнопка оператора присвоювання.",
+                options: ["Стандартна", "Форматування", "Калькулятор - MathCAD"],
+                correctIndex: 2
+            },
+            {
+                id: 5,
+                question: "Пакет MathCAD призначений для ...",
+                options: [
+                    "Роботи з графічними файлами",
+                    "Створення, редагування та перегляду текстових документів",
+                    "Виконання арифметичних обчислень",
+                    "Роботи з базами даних"
+                ],
+                correctIndex: 2
+            },
+            {
+                id: 6,
+                question: "Який символ є роздільником для цілих і дробових чисел MathCAD?",
+                options: ["крапка", "тире", "кома"],
+                correctIndex: 0
+            },
+            {
+                id: 7,
+                question: "Як записати розрахункову формулу",
+                options: ["підрахувати значення", "записати невідомі", "всі відповіді вірні"],
+                correctIndex: 2
+            },
+            {
+                id: 8,
+                question: "В якому порядку повинні бути розташовані присвоєння і формула",
+                options: ["зверху вниз", "знизу вгору", "не має значення як"],
+                correctIndex: 0
+            },
+            {
+                id: 9,
+                question: "Як пересунути об'єкт в інше місце",
+                options: [
+                    "спіймати об'єкт рука та перетягнути",
+                    "спіймати стрілочку та перемістити",
+                    "спіймати хрестик та перемістити"
+                ],
+                correctIndex: 0
+            },
+            {
+                id: 10,
+                question: "Об'єкт, який має ім'я та якому можна присвоювати різні значення називається ...",
+                options: [
+                    "ідентификатор",
+                    "стала",
+                    "результат підрахунків",
+                    "змінна"
+                ],
+                correctIndex: 3
+            }
+        ];
+
+        // Стан тесту
+        let currentQuestionIndex = 0;
+        let userAnswers = new Array(questionsData.length).fill(null);
+
+        // Посилання на DOM-елементи
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const headerCounter = document.getElementById('header-counter');
+        const currentQNumEl = document.getElementById('current-q-num');
+        const totalQNumEl = document.getElementById('total-q-num');
+        const progressBar = document.getElementById('progress-bar');
+        const questionBadge = document.getElementById('question-badge');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const validationMsg = document.getElementById('validation-msg');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const nextBtnText = document.getElementById('next-btn-text');
+        const pillsNav = document.getElementById('pills-nav');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // Ініціалізація додатку
+        function initQuiz() {
+            totalQNumEl.textContent = questionsData.length;
+            renderPills();
+            renderQuestion();
+        }
+
+        // Рендер кнопок швидкого переходу між питаннями
+        function renderPills() {
+            pillsNav.innerHTML = '';
+            questionsData.forEach((_, idx) => {
+                const pill = document.createElement('button');
+                pill.type = 'button';
+                pill.textContent = idx + 1;
+                pill.title = `Перейти до питання ${idx + 1}`;
+                pill.className = 'w-8 h-8 rounded-lg text-xs font-bold transition-all duration-200 focus:outline-none border';
+                
+                if (idx === currentQuestionIndex) {
+                    pill.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600', 'shadow-sm', 'scale-105');
+                } else if (userAnswers[idx] !== null) {
+                    pill.classList.add('bg-indigo-50', 'text-indigo-700', 'border-indigo-200', 'hover:bg-indigo-100');
+                } else {
+                    pill.classList.add('bg-white', 'text-slate-500', 'border-slate-200', 'hover:bg-slate-100', 'hover:text-slate-800');
+                }
+
+                pill.addEventListener('click', () => {
+                    validationMsg.classList.add('hidden');
+                    currentQuestionIndex = idx;
+                    renderQuestion();
+                });
+
+                pillsNav.appendChild(pill);
+            });
+        }
+
+        // Відображення поточного питання
+        function renderQuestion() {
+            const q = questionsData[currentQuestionIndex];
+            const total = questionsData.length;
+
+            // Оновлення лічильників та прогрес-бару
+            currentQNumEl.textContent = currentQuestionIndex + 1;
+            questionBadge.textContent = currentQuestionIndex + 1;
+            const progressPercent = ((currentQuestionIndex + 1) / total) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+
+            // Текст питання
+            questionText.textContent = q.question;
+
+            // Очищення та побудова варіантів відповідей
+            optionsContainer.innerHTML = '';
+            if (q.options.length === 3) {
+                optionsContainer.className = 'grid grid-cols-1 sm:grid-cols-3 gap-3.5';
+            } else {
+                optionsContainer.className = 'grid grid-cols-1 sm:grid-cols-2 gap-3.5';
+            }
+
+            q.options.forEach((optionText, index) => {
+                const isSelected = userAnswers[currentQuestionIndex] === index;
+                
+                const optionBtn = document.createElement('button');
+                optionBtn.type = 'button';
+                optionBtn.className = `group text-left p-4 rounded-2xl border-2 transition-all duration-200 flex items-center gap-3.5 focus:outline-none ${
+                    isSelected 
+                    ? 'border-indigo-600 bg-indigo-50/70 shadow-sm' 
+                    : 'border-slate-200/80 bg-slate-50/50 hover:border-indigo-300 hover:bg-white'
+                }`;
+
+                // Кастомний радіо-індикатор
+                const radioCircle = document.createElement('span');
+                radioCircle.className = `w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
+                    isSelected 
+                    ? 'border-indigo-600 bg-indigo-600' 
+                    : 'border-slate-300 bg-white group-hover:border-indigo-400'
+                }`;
+
+                if (isSelected) {
+                    radioCircle.innerHTML = `<span class="w-2 h-2 rounded-full bg-white"></span>`;
+                }
+
+                // Текст варіанту
+                const labelSpan = document.createElement('span');
+                labelSpan.className = `text-sm sm:text-base font-medium leading-snug ${
+                    isSelected ? 'text-indigo-950 font-semibold' : 'text-slate-700'
+                }`;
+                labelSpan.textContent = optionText;
+
+                optionBtn.appendChild(radioCircle);
+                optionBtn.appendChild(labelSpan);
+
+                optionBtn.addEventListener('click', () => {
+                    userAnswers[currentQuestionIndex] = index;
+                    validationMsg.classList.add('hidden');
+                    renderQuestion();
+                });
+
+                optionsContainer.appendChild(optionBtn);
+            });
+
+            // Керування кнопками навігації
+            prevBtn.disabled = currentQuestionIndex === 0;
+            
+            if (currentQuestionIndex === total - 1) {
+                nextBtnText.textContent = 'Завершити тест';
+                nextBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700', 'shadow-indigo-200');
+                nextBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700', 'shadow-emerald-200');
+            } else {
+                nextBtnText.textContent = 'Далі';
+                nextBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700', 'shadow-emerald-200');
+                nextBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'shadow-indigo-200');
+            }
+
+            renderPills();
+        }
+
+        // Обробка натискання «Назад»
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                validationMsg.classList.add('hidden');
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        });
+
+        // Обробка натискання «Далі» / «Завершити тест»
+        nextBtn.addEventListener('click', () => {
+            if (userAnswers[currentQuestionIndex] === null) {
+                validationMsg.classList.remove('hidden');
+                return;
+            }
+
+            if (currentQuestionIndex < questionsData.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                // Перевірка, чи всі питання мають відповідь
+                const firstUnanswered = userAnswers.findIndex(ans => ans === null);
+                if (firstUnanswered !== -1) {
+                    currentQuestionIndex = firstUnanswered;
+                    renderQuestion();
+                    validationMsg.classList.remove('hidden');
+                    return;
+                }
+                showResults();
+            }
+        });
+
+        // Показ екрану результатів
+        function showResults() {
+            quizScreen.classList.add('hidden');
+            headerCounter.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            // Підрахунок правильних відповідей
+            let correctCount = 0;
+            questionsData.forEach((q, idx) => {
+                if (userAnswers[idx] === q.correctIndex) {
+                    correctCount++;
+                }
+            });
+
+            const total = questionsData.length;
+            const percentage = Math.round((correctCount / total) * 100);
+
+            // Встановлення теми тесту та статистики
+            document.getElementById('result-topic').textContent = `Тема тесту: ${QUIZ_TOPIC}`;
+            document.getElementById('correct-count').textContent = correctCount;
+            document.getElementById('total-count').textContent = total;
+            document.getElementById('score-percentage').textContent = `${percentage}%`;
+
+            // Анімація кільця прогресу
+            const ring = document.getElementById('score-ring');
+            const circumference = 427.26;
+            const offset = circumference - (percentage / 100) * circumference;
+            
+            const gradeBadge = document.getElementById('grade-badge');
+            if (percentage >= 85) {
+                ring.setAttribute('stroke', '#10b981');
+                gradeBadge.className = 'mt-3 inline-block px-4 py-1.5 rounded-xl text-sm font-bold bg-emerald-100 text-emerald-800';
+                gradeBadge.textContent = 'Відмінний результат! Ви чудово засвоїли тему.';
+            } else if (percentage >= 60) {
+                ring.setAttribute('stroke', '#4f46e5');
+                gradeBadge.className = 'mt-3 inline-block px-4 py-1.5 rounded-xl text-sm font-bold bg-indigo-100 text-indigo-800';
+                gradeBadge.textContent = 'Добрий результат! Є кілька моментів для повторення.';
+            } else {
+                ring.setAttribute('stroke', '#f59e0b');
+                gradeBadge.className = 'mt-3 inline-block px-4 py-1.5 rounded-xl text-sm font-bold bg-amber-100 text-amber-800';
+                gradeBadge.textContent = 'Рекомендуємо повторити теоретичний матеріал і спробувати ще раз.';
+            }
+
+            setTimeout(() => {
+                ring.style.strokeDashoffset = offset;
+            }, 100);
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Перезапуск тесту
+        restartBtn.addEventListener('click', () => {
+            currentQuestionIndex = 0;
+            userAnswers = new Array(questionsData.length).fill(null);
+            
+            document.getElementById('score-ring').style.strokeDashoffset = '427.26';
+
+            resultScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            headerCounter.classList.remove('hidden');
+            validationMsg.classList.add('hidden');
+
+            renderQuestion();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Запуск при завантаженні сторінки
+        window.addEventListener('DOMContentLoaded', initQuiz);
+    </script>
+</body>
+</html>
